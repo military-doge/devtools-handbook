@@ -55,11 +55,10 @@ sudo usermod -aG docker $USER
 
 重新登录后生效：断开 SSH 再重新连接即可。组成员身份在登录时读取，当前已打开的终端不会自动更新。
 
-验证：
+验证（无需 sudo 能同时输出客户端与服务端信息即成功）：
 
 ```bash
-groups          # 输出应包含 docker
-docker ps       # 不再需要 sudo
+docker version
 ```
 
 - 临时生效（仅当前终端）：`newgrp docker`，`exit` 后失效。
