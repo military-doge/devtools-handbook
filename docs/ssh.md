@@ -23,13 +23,7 @@ To authenticate, visit:
     https://login.tailscale.com/a/xxxxxxxxxxxx
 ```
 
-在任意设备的浏览器里打开该地址，用 Google / Microsoft / GitHub / 邮箱账号登录并授权，服务器即加入同一 tailnet。无头服务器复制链接到本地浏览器操作即可。
-
-无人值守场景可先创建 auth key，跳过交互：
-
-```bash
-sudo tailscale up --authkey <authkey>
-```
+在任意设备的浏览器里打开该地址，用 Google / Microsoft / GitHub / 邮箱账号登录并授权，服务器即加入同一 tailnet。
 
 Windows / macOS 安装官方客户端，登录同一账号即可。查看本机地址与在线设备：
 
