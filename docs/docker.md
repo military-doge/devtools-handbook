@@ -132,15 +132,17 @@ docker run -d -p 127.0.0.1:9443:9443 --name portainer --restart=always \
   portainer/portainer-ce:latest
 ```
 
-在本地电脑建立 SSH 隧道：
+在控制端建立 SSH 隧道：
 
 ```bash
-ssh -L 9443:localhost:9443 user@host
+ssh -L 9443:localhost:9443 <用户名>@<服务器IP>
 ```
+
+`<用户名>`、`<服务器IP>` 替换为实际值，例如 `user@192.168.1.10`。
 
 然后浏览器打开 `https://localhost:9443`。
 
-本地 `localhost:9443` 的流量经 SSH 加密转发到主机的回环地址，访问权限等同 SSH 登录权限。
+控制端 `localhost:9443` 的流量经 SSH 加密转发到主机的回环地址，访问权限等同 SSH 登录权限。
 
 ## 七、卸载
 
