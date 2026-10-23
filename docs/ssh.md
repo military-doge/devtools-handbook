@@ -9,6 +9,8 @@
 
 服务器没有公网 IP、或不想向公网暴露 22 端口时，先用 Tailscale 把设备接入同一个虚拟内网。每台设备获得一个 `100.x.y.z` 地址，彼此可直连，流量端到端加密。
 
+Windows / macOS 安装官方客户端，登录同一账号即可。
+
 Linux 服务器安装并登录：
 
 ```bash
@@ -23,9 +25,9 @@ To authenticate, visit:
     https://login.tailscale.com/a/xxxxxxxxxxxx
 ```
 
-在任意设备的浏览器里打开该地址，用 Google / Microsoft / GitHub / 邮箱账号登录并授权，服务器即加入同一 tailnet。
+在任意设备的浏览器里打开该地址，用同一账号登录并授权，服务器即加入同一 tailnet。
 
-Windows / macOS 安装官方客户端，登录同一账号即可。查看本机地址与在线设备：
+查看本机地址与在线设备：
 
 ```bash
 tailscale ip -4
