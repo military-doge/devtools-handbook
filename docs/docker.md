@@ -132,7 +132,7 @@ docker run -d -p 127.0.0.1:9443:9443 --name portainer --restart=always \
   portainer/portainer-ce:latest
 ```
 
-在控制端的 `~/.ssh/config` 中添加：
+在控制端的 SSH 配置文件中添加（Windows：`C:\Users\<用户名>\.ssh\config`；Linux/macOS：`~/.ssh/config`）：
 
 ```text
 Host <服务器IP>
