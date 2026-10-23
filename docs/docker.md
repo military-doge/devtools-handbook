@@ -159,7 +159,18 @@ docker restart portainer
 docker logs portainer
 ```
 
-粘贴 token 后设置用户名和密码。若提交提示 403，通常是 token 已过期或含多余空格，重启容器后重新获取。
+日志中会出现类似内容：
+
+```text
+==========================
+setup_token=<token>
+
+Paste it into the setup screen, or send it in the X-Setup-Token header.
+Start with --no-setup-token to disable.
+==========================
+```
+
+复制 `setup_token=` 后面的值粘贴到页面，然后设置用户名和密码。若提交提示 403，通常是 token 已过期或含多余空格，重启容器后重新获取。
 
 ## 七、卸载
 
