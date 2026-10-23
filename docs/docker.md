@@ -95,48 +95,23 @@ sudo systemctl enable docker
 
 设置后，系统开机时自动启动 Docker 守护进程，无需手动 `sudo systemctl start docker`，配置了 `restart` 策略的容器也会随之恢复运行。
 
-### 3. 日志轮转
-
-编辑 `/etc/docker/daemon.json`：
-
-```json
-{
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m",
-    "max-file": "3"
-  }
-}
-```
-
-重启 docker 生效。仅对**新建**容器生效，旧容器需重建。
-
-### 4. 更改数据目录（可选）
-
-默认数据在 `/var/lib/docker`。迁移前先停止 docker，再把数据整体搬到新目录，然后：
-
-```json
-{
-  "data-root": "/data/docker"
-}
-```
-
-重启 docker 并用 `docker info | grep "Docker Root Dir"` 确认。
-
-### 5. 常用服务管理
+### 3. 常用服务管理
 
 ```bash
-sudo systemctl start docker
-sudo systemctl stop docker
-sudo systemctl status docker
+sudo systemctl start docker     # 启动
+sudo systemctl stop docker      # 停止
+sudo systemctl status docker    # 查看状态
 ```
 
 ## 六、卸载
 
 ```bash
+# 卸载 Docker 相关软件包
 sudo apt purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+# 删除镜像、容器、卷等数据
 sudo rm -rf /var/lib/docker
 sudo rm -rf /var/lib/containerd
+# 删除 apt 源与 GPG key
 sudo rm /etc/apt/sources.list.d/docker.sources
 sudo rm /etc/apt/keyrings/docker.asc
 ```
