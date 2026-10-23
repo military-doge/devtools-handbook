@@ -60,33 +60,15 @@ sudo usermod -aG docker $USER
 
 > 安全提示：`docker` 组≈root 权限，仅授予可信用户。
 
-### 2. 配置镜像加速
-
-编辑 `/etc/docker/daemon.json`：
-
-```json
-{
-  "registry-mirrors": [
-    "https://docker.1ms.run",
-    "https://docker.xuanyuan.me"
-  ]
-}
-```
-
-然后重启：
+### 2. 开机自启
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl restart docker
+sudo systemctl enable docker
 ```
-
-用 `docker info` 查看 `Registry Mirrors` 是否生效。
-
-> 注意：上述为第三方镜像，可用性随时间变化，失效时自行替换。
 
 ### 3. 日志轮转
 
-在 `/etc/docker/daemon.json` 中追加（与镜像加速合并到同一 JSON）：
+编辑 `/etc/docker/daemon.json`：
 
 ```json
 {
@@ -117,7 +99,6 @@ sudo systemctl restart docker
 ```bash
 sudo systemctl start docker
 sudo systemctl stop docker
-sudo systemctl enable docker    # 开机自启
 sudo systemctl status docker
 ```
 
