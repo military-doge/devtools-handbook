@@ -119,6 +119,8 @@ docker run -d -p 9443:9443 --name portainer --restart=always \
 
 浏览器打开 `https://<主机IP>:9443`，首次访问设置管理员密码。
 
+> 安全提示：挂载 `/var/run/docker.sock` 等价于 root 权限；不要将面板端口直接暴露公网。
+
 ### 更安全的访问方式（SSH 隧道）
 
 仅监听本机，不向网络暴露端口：
@@ -139,8 +141,6 @@ ssh -L 9443:localhost:9443 user@host
 然后浏览器打开 `https://localhost:9443`。
 
 本地 `localhost:9443` 的流量经 SSH 加密转发到主机的回环地址，访问权限等同 SSH 登录权限。
-
-> 安全提示：挂载 `/var/run/docker.sock` 等价于 root 权限；不要将面板端口直接暴露公网。
 
 ## 七、卸载
 
