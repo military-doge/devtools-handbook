@@ -121,8 +121,6 @@ docker run -d -p 9443:9443 --name portainer --restart=always \
 
 > 安全提示：挂载 `/var/run/docker.sock` 等价于 root 权限；不要将面板端口直接暴露公网。
 
-轻量替代：Dockge（专注 compose）、Cockpit（系统级面板）。
-
 ## 七、卸载
 
 ```bash
