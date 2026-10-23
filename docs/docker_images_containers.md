@@ -84,7 +84,7 @@ docker rm web          # 删除已停止的容器
 docker rm -f web       # 强制删除运行中的容器
 ```
 
-### 6. 完整示例（Debian）
+## 三、完整示例（Debian）
 
 ```bash
 # 拉取镜像
