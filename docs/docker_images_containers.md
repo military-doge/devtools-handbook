@@ -96,20 +96,38 @@ docker restart <实例名>
 
 ### 4. 进入运行中的容器
 
+`docker exec` 只对运行中的容器有效。
+
+在容器内新开一个 shell（推荐）：
+
 ```bash
 docker exec -it <实例名> bash
 ```
 
-`docker exec` 只对运行中的容器有效。
+`exit` 退出的是这个新开的 shell，容器本身继续运行。
 
-也可以用 `attach` 接入容器主进程（PID 1）：
+也可以不开 shell，直接在容器里执行一条命令（俗称「穿透执行」，命令在容器内部运行，不是宿主机）：
+
+```bash
+docker exec <实例名> cat /etc/os-release   # 查看系统版本
+docker exec <实例名> ls /etc               # 列目录
+docker exec -u root <实例名> whoami        # 以 root 身份执行
+```
+
+这种执行方式不需要 `-it`；只有命令本身需要交互（如 `bash`、`vim`）时才加。
+
+#### attach 与 exec 的区别
+
+容器里 PID 1 的进程决定容器的生死。`docker attach` 接入的正是这个主进程：
 
 ```bash
 docker attach <实例名>
 ```
 
-- `attach`：接入原有主进程。`Ctrl+P` `Ctrl+Q` 脱离（容器继续运行），`Ctrl+C` 可能终止主进程；容器需以 `-it` 启动才好用。
-- `exec`：在容器内新开一个进程，`exit` 不影响容器，日常排查更推荐。
+- `attach`：你的键盘直接接到主进程上。`exit` 或 `Ctrl+C` 会结束主进程，容器随之停止；`Ctrl+P` `Ctrl+Q` 可脱离而容器继续运行。主进程需以 `-it` 启动、且会读取 stdin，交互才方便。
+- `exec`：在容器内另开一个进程，与主进程互不影响。`exit` 只关掉这个新进程，容器照常运行，日常排查更推荐。
+
+一句话：`attach` 是接管主进程，`exec` 是另开一个窗口。
 
 ### 5. 删除容器
 
