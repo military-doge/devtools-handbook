@@ -45,7 +45,9 @@ docker run -d --name web -p 8080:80 nginx
 docker run -it --name debian-mount -v "$PWD/data:/data" debian:12 bash
 ```
 
-以上示例相互独立，分别创建 `debian-demo`、`web`、`debian-mount` 三个容器。挂载后，主机与容器共享该目录，任一侧修改对方立即可见；`$PWD` 会展开为当前绝对路径。
+以上示例相互独立，分别创建 `debian-demo`、`web`、`debian-mount` 三个容器。
+
+`-v 主机路径:容器路径` 表示把主机目录挂载到容器：冒号左边必须是主机上**已存在**的目录；冒号右边的容器路径由 Docker 在实例化时**自动创建**。两者指向同一份数据，任一侧修改，另一侧立即可见。
 
 常用参数：
 
