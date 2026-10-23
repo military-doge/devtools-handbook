@@ -1,7 +1,6 @@
 # Docker Engine 安装与配置（Ubuntu）
 
-> 官方安装指南：<https://docs.docker.com/engine/install/ubuntu/>
-> 安装包发布页：<https://download.docker.com/linux/ubuntu/>
+> 官方文档（安装与更新以此为准）：<https://docs.docker.com/engine/install/ubuntu/>
 > 适用于 Ubuntu 26.10 / 26.04 LTS / 24.04 LTS / 22.04 LTS（64 位）
 
 ## 一、卸载冲突包
@@ -11,8 +10,6 @@ sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-
 ```
 
 ## 二、配置官方 apt 源
-
-> 官方说明：<https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository>
 
 ```bash
 # 添加 Docker 官方 GPG key
@@ -61,7 +58,6 @@ sudo usermod -aG docker $USER
 
 重新登录（或 `newgrp docker`）后生效。
 
-> 官方说明：<https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user>
 > 安全提示：`docker` 组≈root 权限，仅授予可信用户。
 
 ### 2. 配置镜像加速
@@ -86,7 +82,6 @@ sudo systemctl restart docker
 
 用 `docker info` 查看 `Registry Mirrors` 是否生效。
 
-> 官方配置参考：<https://docs.docker.com/engine/daemon/>
 > 注意：上述为第三方镜像，可用性随时间变化，失效时自行替换。
 
 ### 3. 日志轮转
@@ -105,8 +100,6 @@ sudo systemctl restart docker
 
 重启 docker 生效。仅对**新建**容器生效，旧容器需重建。
 
-> 官方文档：<https://docs.docker.com/engine/logging/configure/>
-
 ### 4. 更改数据目录（可选）
 
 默认数据在 `/var/lib/docker`。迁移前先停止 docker，再把数据整体搬到新目录，然后：
@@ -118,8 +111,6 @@ sudo systemctl restart docker
 ```
 
 重启 docker 并用 `docker info | grep "Docker Root Dir"` 确认。
-
-> 参考：<https://docs.docker.com/engine/daemon/#daemon-data-directory>
 
 ### 5. 常用服务管理
 
@@ -141,11 +132,3 @@ sudo rm /etc/apt/keyrings/docker.asc
 ```
 
 镜像、容器、卷及自定义配置不会自动删除，需手动清理。
-
-## 官方链接（更新时对照）
-
-- 安装（Ubuntu）：<https://docs.docker.com/engine/install/ubuntu/>
-- 安装后配置：<https://docs.docker.com/engine/install/linux-postinstall/>
-- 守护进程配置（daemon.json）：<https://docs.docker.com/engine/daemon/>
-- 日志配置：<https://docs.docker.com/engine/logging/configure/>
-- 卸载：<https://docs.docker.com/engine/install/ubuntu/#uninstall-docker-engine>
