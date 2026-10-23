@@ -107,7 +107,7 @@ sudo systemctl status docker    # 查看状态
 
 无头主机没有桌面，图形面板通过浏览器远程管理容器，能显著提升日常效率。这里选用 Portainer（官方文档：<https://docs.portainer.io/start/install-ce/server/docker/linux>）。
 
-### 部署
+### 1. 部署
 
 ```bash
 docker volume create portainer_data
@@ -121,7 +121,7 @@ docker run -d -p 9443:9443 --name portainer --restart=always \
 
 > 安全提示：挂载 `/var/run/docker.sock` 等价于 root 权限；不要将面板端口直接暴露公网。
 
-### 更安全的访问方式
+### 2. 更安全的访问方式
 
 仅监听本机，不向网络暴露端口：
 
@@ -145,7 +145,7 @@ Host <服务器IP>
 
 控制端 `localhost:9443` 的流量经 SSH 加密转发到主机的回环地址，访问权限等同 SSH 登录权限。
 
-### 初始化账号
+### 3. 初始化账号
 
 首次打开面板后，需在约 5 分钟内创建管理员账号。超时会提示 `Your Portainer instance timed out`，重启容器重新开启窗口：
 
