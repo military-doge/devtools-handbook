@@ -8,7 +8,7 @@
 
 ```bash
 docker pull debian:12
-docker images
+docker images          # 查看本地已下载的镜像
 ```
 
 `docker pull debian:12` 拉取 Debian 12（bookworm）镜像；`docker images` 查看本地已有镜像。
