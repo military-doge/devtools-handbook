@@ -38,9 +38,6 @@ sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-> 安装特定版本：先 `apt list --all-versions docker-ce` 查版本，再
-> `sudo apt install docker-ce=<版本> docker-ce-cli=<版本> containerd.io docker-buildx-plugin docker-compose-plugin`
-
 ## 四、验证安装
 
 ```bash
