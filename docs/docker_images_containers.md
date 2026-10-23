@@ -102,6 +102,15 @@ docker exec -it <实例名> bash
 
 `docker exec` 只对运行中的容器有效。
 
+也可以用 `attach` 接入容器主进程（PID 1）：
+
+```bash
+docker attach <实例名>
+```
+
+- `attach`：接入原有主进程。`Ctrl+P` `Ctrl+Q` 脱离（容器继续运行），`Ctrl+C` 可能终止主进程；容器需以 `-it` 启动才好用。
+- `exec`：在容器内新开一个进程，`exit` 不影响容器，日常排查更推荐。
+
 ### 5. 删除容器
 
 ```bash
