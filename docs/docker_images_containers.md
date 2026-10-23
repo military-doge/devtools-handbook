@@ -39,10 +39,10 @@ docker run -it --name debian-demo debian:12 bash
 docker run -d --name web -p 8080:80 nginx
 ```
 
-挂载主机目录到容器（把当前目录的 `data` 映射到容器 `/data`）：
+挂载主机目录到容器（把主机的 `/home/user/data` 映射到容器 `/data`）：
 
 ```bash
-docker run -it --name debian-mount -v "$PWD/data:/data" debian:12 bash
+docker run -it --name debian-mount -v /home/user/data:/data debian:12 bash
 ```
 
 以上示例相互独立，分别创建 `debian-demo`、`web`、`debian-mount` 三个容器。
