@@ -107,6 +107,8 @@ sudo systemctl status docker    # 查看状态
 
 无头主机没有桌面，图形面板通过浏览器远程管理容器，能显著提升日常效率。这里选用 Portainer（官方文档：<https://docs.portainer.io/start/install-ce/server/docker/linux>）。
 
+### 部署
+
 ```bash
 docker volume create portainer_data
 docker run -d -p 9443:9443 --name portainer --restart=always \
@@ -117,7 +119,26 @@ docker run -d -p 9443:9443 --name portainer --restart=always \
 
 浏览器打开 `https://<主机IP>:9443`，首次访问设置管理员密码。
 
-> 更安全的访问方式：把 `-p 9443:9443` 改为 `-p 127.0.0.1:9443:9443`，端口只监听本机。远程时在本地执行 `ssh -L 9443:localhost:9443 user@host`，浏览器打开 `https://localhost:9443`。其含义是把本地 `localhost:9443` 的流量经 SSH 加密转发到主机的回环地址，面板不向网络暴露，访问权限等同 SSH 登录权限。
+### 更安全的访问方式（SSH 隧道）
+
+仅监听本机，不向网络暴露端口：
+
+```bash
+docker run -d -p 127.0.0.1:9443:9443 --name portainer --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce:latest
+```
+
+在本地电脑建立 SSH 隧道：
+
+```bash
+ssh -L 9443:localhost:9443 user@host
+```
+
+然后浏览器打开 `https://localhost:9443`。
+
+本地 `localhost:9443` 的流量经 SSH 加密转发到主机的回环地址，访问权限等同 SSH 登录权限。
 
 > 安全提示：挂载 `/var/run/docker.sock` 等价于 root 权限；不要将面板端口直接暴露公网。
 
