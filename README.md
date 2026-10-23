@@ -6,7 +6,7 @@
 
 - [Git](docs/git.md) — 版本控制、分支、远程协作
 - [Docker 安装与配置](docs/docker_install_config.md) — 安装、配置、图形面板
-- [Docker 镜像与容器操作](docs/docker_commands.md) — 拉取镜像、起停容器、查看状态
+- [Docker 镜像与容器操作](docs/docker_images_containers.md) — 拉取镜像、起停容器、查看状态
 - [SSH](docs/ssh.md) — 密钥、免密登录、端口转发
 
 ## 说明
