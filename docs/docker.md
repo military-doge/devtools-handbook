@@ -145,6 +145,22 @@ Host <服务器IP>
 
 控制端 `localhost:9443` 的流量经 SSH 加密转发到主机的回环地址，访问权限等同 SSH 登录权限。
 
+### 初始化账号
+
+首次打开面板后，需在约 5 分钟内创建管理员账号。超时会提示 `Your Portainer instance timed out`，重启容器重新开启窗口：
+
+```bash
+docker restart portainer
+```
+
+新版需要 setup token，从容器日志获取：
+
+```bash
+docker logs portainer 2>&1 | grep -i "setup token"
+```
+
+粘贴 token 后设置用户名和密码。若提交提示 403，通常是 token 已过期或含多余空格，重启容器后重新获取。
+
 ## 七、卸载
 
 ```bash
