@@ -53,7 +53,7 @@ sudo docker run hello-world
 sudo usermod -aG docker $USER
 ```
 
-重新登录后生效：断开 SSH（`exit`）再重新连接即可。组成员身份在登录时读取，当前已打开的终端不会自动更新。
+重新登录后生效：断开 SSH 再重新连接即可。组成员身份在登录时读取，当前已打开的终端不会自动更新。
 
 验证：
 
