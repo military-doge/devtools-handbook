@@ -39,7 +39,13 @@ docker run -it --name debian-demo debian:12 bash
 docker run -d --name web -p 8080:80 nginx
 ```
 
-以上是两种独立的创建方式，会分别创建 `debian-demo` 和 `web` 两个容器。
+挂载主机目录到容器（把当前目录的 `data` 映射到容器 `/data`）：
+
+```bash
+docker run -it --name debian-mount -v "$PWD/data:/data" debian:12 bash
+```
+
+以上示例相互独立，分别创建 `debian-demo`、`web`、`debian-mount` 三个容器。挂载后，主机与容器共享该目录，任一侧修改对方立即可见；`$PWD` 会展开为当前绝对路径。
 
 常用参数：
 
