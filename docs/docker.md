@@ -103,9 +103,9 @@ sudo systemctl stop docker      # 停止
 sudo systemctl status docker    # 查看状态
 ```
 
-## 六、图形面板（Portainer）
+## 六、图形面板
 
-无头主机没有桌面，图形面板通过浏览器远程管理容器，能显著提升日常效率。
+无头主机没有桌面，图形面板通过浏览器远程管理容器，能显著提升日常效率。这里选用 Portainer（官方文档：<https://docs.portainer.io/start/install-ce/server/docker/linux>）。
 
 ```bash
 docker volume create portainer_data
@@ -122,8 +122,6 @@ docker run -d -p 9443:9443 --name portainer --restart=always \
 > 安全提示：挂载 `/var/run/docker.sock` 等价于 root 权限；不要将面板端口直接暴露公网。
 
 轻量替代：Dockge（专注 compose）、Cockpit（系统级面板）。
-
-官方文档：<https://docs.portainer.io/start/install-ce/server/docker/linux>
 
 ## 七、卸载
 
