@@ -96,8 +96,6 @@ docker restart <实例名>
 
 ### 4. 进入运行中的容器
 
-`docker exec` 与 `docker attach` 都只对运行中的容器有效。
-
 在容器内新开一个 shell（推荐）：
 
 ```bash
