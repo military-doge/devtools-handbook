@@ -33,7 +33,7 @@ docker rmi debian:12
 docker run -it --name debian-demo debian:12 bash
 ```
 
-镜像名后面的 `bash` 是容器启动时执行的命令，会覆盖镜像默认命令；`bash` 与 `/bin/bash` 等价。`-it` 保证 shell 可交互，缺少时会立即退出。
+镜像名后面的 `bash` 是容器启动时执行的命令，会覆盖镜像默认命令；`bash` 与 `/bin/bash` 等价。
 
 后台运行并映射端口：
 
