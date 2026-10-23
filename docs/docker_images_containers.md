@@ -11,7 +11,7 @@ docker images
 
 `docker pull debian:12` 拉取 Debian 12（bookworm）镜像；`docker images` 查看本地已有镜像。
 
-在 Docker Hub 查找镜像与标签，例如 Debian：<https://hub.docker.com/_/debian>（在页面 **Tags** 中选择所需版本）
+在 Docker Hub 查找镜像与标签，例如 Debian：<https://hub.docker.com/_/debian>。在页面 **Tags** 中选择所需版本。
 
 ## 二、拉起容器
 
