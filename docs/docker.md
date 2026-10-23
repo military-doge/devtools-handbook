@@ -53,7 +53,17 @@ sudo docker run hello-world
 sudo usermod -aG docker $USER
 ```
 
-重新登录（或 `newgrp docker`）后生效。
+重新登录后生效：断开 SSH（`exit`）再重新连接即可。组成员身份在登录时读取，当前已打开的终端不会自动更新。
+
+验证：
+
+```bash
+groups          # 输出应包含 docker
+docker ps       # 不再需要 sudo
+```
+
+- 临时生效（仅当前终端）：`newgrp docker`，`exit` 后失效。
+- 使用 tmux/screen 时，重连后需新建会话，旧会话不会更新。
 
 > 安全提示：`docker` 组≈root 权限，仅授予可信用户。
 
