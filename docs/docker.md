@@ -55,14 +55,35 @@ sudo usermod -aG docker $USER
 
 重新登录后生效：断开 SSH 再重新连接即可。组成员身份在登录时读取，当前已打开的终端不会自动更新。
 
-验证（无需 sudo 能同时输出客户端与服务端信息即成功）：
+验证：
 
 ```bash
 docker version
 ```
 
-- 临时生效（仅当前终端）：`newgrp docker`，`exit` 后失效。
-- 使用 tmux/screen 时，重连后需新建会话，旧会话不会更新。
+正常输出同时包含 Client 与 Server 两部分（版本号可能不同）：
+
+```text
+Client: Docker Engine - Community
+ Version:           29.9.2
+ API version:       1.56
+ Go version:        go1.26.10
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          29.9.2
+  API version:      1.56 (minimum version 1.44)
+  Go version:        go1.26.10
+  OS/Arch:           linux/amd64
+ containerd:
+  Version:          2.1.5
+ runc:
+  Version:          1.3.3
+```
+
+若只显示 Client 并报 `permission denied while trying to connect to the docker API`，说明尚未重新登录或未加入 docker 组。
 
 > 安全提示：`docker` 组≈root 权限，仅授予可信用户。
 
