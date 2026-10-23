@@ -1,6 +1,6 @@
-# Docker Engine 安装与配置（Ubuntu）
+# Docker Engine 安装与配置
 
-> 官方文档（安装与更新以此为准）：<https://docs.docker.com/engine/install/ubuntu/>
+> 官方文档：<https://docs.docker.com/engine/install/ubuntu/>
 > 适用于 Ubuntu 26.10 / 26.04 LTS / 24.04 LTS / 22.04 LTS（64 位）
 
 ## 一、卸载冲突包
