@@ -39,6 +39,8 @@ docker run -it --name debian-demo debian:12 bash
 docker run -d --name web -p 8080:80 nginx
 ```
 
+以上是两种独立的创建方式，会分别创建 `debian-demo` 和 `web` 两个容器。
+
 常用参数：
 
 | 参数 | 说明 |
