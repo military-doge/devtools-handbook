@@ -123,7 +123,7 @@ docker run -d -p 9443:9443 --name portainer --restart=always \
 
 ### 2. 更安全的访问方式
 
-仅监听本机，不向网络暴露端口：
+被控端仅监听本机，不向网络暴露端口：
 
 ```bash
 docker run -d -p 127.0.0.1:9443:9443 --name portainer --restart=always \
