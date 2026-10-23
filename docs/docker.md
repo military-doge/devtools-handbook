@@ -156,7 +156,7 @@ docker restart portainer
 新版需要 setup token，从容器日志获取：
 
 ```bash
-docker logs portainer 2>&1 | grep -i "setup token"
+docker logs portainer 2>&1 | grep -iE "setup[_ ]token"
 ```
 
 粘贴 token 后设置用户名和密码。若提交提示 403，通常是 token 已过期或含多余空格，重启容器后重新获取。
