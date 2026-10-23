@@ -70,7 +70,7 @@ docker run -it --name debian-mount -v /home/user/data:/data debian:12 bash
 - `always`：总是自动重启，Docker 服务重启后也会拉起
 - `unless-stopped`：同 `always`，但手动 `docker stop` 后不再自动启动（日常推荐）
 
-已存在的容器可用 `docker update --restart=<策略> <容器名>` 修改。
+已存在的容器可用 `docker update --restart=<策略> <实例名>` 修改。
 
 宿主机重启后的自动拉起，依赖 Docker 守护进程开机自启（`systemctl enable docker`）。
 
@@ -79,17 +79,17 @@ docker run -it --name debian-mount -v /home/user/data:/data debian:12 bash
 ```bash
 docker ps                 # 运行中的容器
 docker ps -a              # 所有容器（含已停止）
-docker inspect web        # 详细信息（IP、挂载、配置）
-docker logs web           # 容器日志
+docker inspect <实例名>    # 详细信息（IP、挂载、配置）
+docker logs <实例名>       # 容器日志
 docker stats              # 实时资源占用
 ```
 
 ### 3. 启动 / 停止 / 重启
 
 ```bash
-docker stop web
-docker start web
-docker restart web
+docker stop <实例名>
+docker start <实例名>
+docker restart <实例名>
 ```
 
 `start` 只启动已存在但停止的容器，不能创建新容器。
@@ -97,14 +97,14 @@ docker restart web
 ### 4. 进入运行中的容器
 
 ```bash
-docker exec -it debian-demo bash
+docker exec -it <实例名> bash
 ```
 
 ### 5. 删除容器
 
 ```bash
-docker rm web          # 删除已停止的容器
-docker rm -f web       # 强制删除运行中的容器
+docker rm <实例名>       # 删除已停止的容器
+docker rm -f <实例名>    # 强制删除运行中的容器
 ```
 
 ## 三、完整示例（Debian）
