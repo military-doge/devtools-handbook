@@ -106,7 +106,7 @@ docker exec -it <实例名> bash
 
 `exit` 退出的是这个新开的 shell，容器本身继续运行。
 
-也可以不开 shell，直接在容器里执行一条命令（俗称「穿透执行」）：
+也可以不开 shell，直接在容器里执行一条命令：
 
 ```bash
 docker exec <实例名> cat /etc/os-release   # 查看系统版本
