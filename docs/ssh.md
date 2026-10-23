@@ -34,6 +34,8 @@ tailscale ip -4
 tailscale status
 ```
 
+地址可以自选：在管理后台的设备详情里修改 IPv4 地址，换成一个好记的 `100.x.y.z` 即可。
+
 之后直接通过虚拟地址 SSH，无需端口映射或公网 IP：
 
 ```bash
