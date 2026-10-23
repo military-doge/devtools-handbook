@@ -53,6 +53,15 @@ docker run -d --name web -p 8080:80 nginx
 | `-v 主机路径:容器路径` | 目录挂载 |
 | `--restart` | 重启策略，如 `always` |
 
+`--restart` 决定容器退出或宿主机重启后是否自动拉起：
+
+- `no`（默认）：不自动重启
+- `on-failure[:次数]`：异常退出（退出码非 0）时重启，可限制次数，如 `on-failure:3`
+- `always`：总是自动重启，Docker 服务或宿主机重启后也会拉起
+- `unless-stopped`：同 `always`，但手动 `docker stop` 后不再自动启动（日常推荐）
+
+宿主机重启后的自动拉起，依赖 Docker 守护进程开机自启（`systemctl enable docker`）。
+
 ### 2. 查看状态
 
 ```bash
