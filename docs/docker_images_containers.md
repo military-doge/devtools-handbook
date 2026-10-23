@@ -96,7 +96,7 @@ docker restart <实例名>
 
 ### 4. 进入运行中的容器
 
-`docker exec` 与 `docker attach` 都只对运行中的容器有效；容器已停止时，可用 `docker start -ai <实例名>` 启动并立即接入（`-a` 接入主进程的输出，`-i` 同时转发键盘输入）。
+`docker exec` 与 `docker attach` 都只对运行中的容器有效；容器已停止时，先 `docker start <实例名>` 启动。
 
 在容器内新开一个 shell（推荐）：
 
