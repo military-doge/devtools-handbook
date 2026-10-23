@@ -2,7 +2,9 @@
 
 > 官方 CLI 参考：<https://docs.docker.com/reference/cli/docker/>
 
-## 一、拉取镜像
+## 一、管理镜像
+
+### 1. 拉取镜像
 
 ```bash
 docker pull debian:12
@@ -13,7 +15,17 @@ docker images
 
 在 Docker Hub 查找镜像与标签，例如 Debian：<https://hub.docker.com/_/debian>。在页面 **Tags** 中选择所需版本。
 
-## 二、拉起容器
+### 2. 删除镜像
+
+```bash
+docker rmi debian:12
+```
+
+镜像被容器占用时需先删除容器，或加 `-f` 强制删除。
+
+## 二、管理容器
+
+### 1. 创建实例
 
 交互式容器（退出后容器停止）：
 
@@ -39,7 +51,7 @@ docker run -d --name web -p 8080:80 nginx
 | `-v 主机路径:容器路径` | 目录挂载 |
 | `--restart` | 重启策略，如 `always` |
 
-## 三、查看容器状态
+### 2. 查看状态
 
 ```bash
 docker ps                 # 运行中的容器
@@ -49,7 +61,7 @@ docker logs web           # 容器日志
 docker stats              # 实时资源占用
 ```
 
-## 四、启动 / 停止 / 重启
+### 3. 启动 / 停止 / 重启
 
 ```bash
 docker stop web
@@ -59,13 +71,20 @@ docker restart web
 
 `start` 只启动已存在但停止的容器，不能创建新容器。
 
-## 五、进入运行中的容器
+### 4. 进入运行中的容器
 
 ```bash
 docker exec -it debian-demo bash
 ```
 
-## 六、完整示例（Debian）
+### 5. 删除容器
+
+```bash
+docker rm web          # 删除已停止的容器
+docker rm -f web       # 强制删除运行中的容器
+```
+
+### 6. 完整示例（Debian）
 
 ```bash
 # 拉取镜像
@@ -90,11 +109,3 @@ docker rmi debian:12
 ```
 
 Debian 镜像默认执行完命令就退出，所以后台运行时需要一个持续命令（如 `sleep infinity`），否则 `docker ps` 看不到它。
-
-## 七、删除
-
-```bash
-docker rm web          # 删除已停止的容器
-docker rm -f web       # 强制删除运行中的容器
-docker rmi debian:12   # 删除镜像
-```
