@@ -93,6 +93,8 @@ Server: Docker Engine - Community
 sudo systemctl enable docker
 ```
 
+设置后，系统开机时自动启动 Docker 守护进程，无需手动 `sudo systemctl start docker`，配置了 `restart` 策略的容器也会随之恢复运行。
+
 ### 3. 日志轮转
 
 编辑 `/etc/docker/daemon.json`：
