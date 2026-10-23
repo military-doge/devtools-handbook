@@ -5,6 +5,8 @@
 
 ## 前置：Tailscale 组网
 
+> 官方文档：<https://tailscale.com/kb/1017/install>
+
 服务器没有公网 IP、或不想向公网暴露 22 端口时，先用 Tailscale 把设备接入同一个虚拟内网。每台设备获得一个 `100.x.y.z` 地址，彼此可直连，流量端到端加密。
 
 Linux 服务器安装并登录：
@@ -38,8 +40,6 @@ ssh user@hostname
 ```bash
 sudo tailscale up --ssh
 ```
-
-> 官方文档：<https://tailscale.com/kb/1017/install>
 
 ## 一、生成密钥
 
