@@ -100,6 +100,8 @@ docker restart <实例名>
 docker exec -it <实例名> bash
 ```
 
+`docker exec` 只对运行中的容器有效。
+
 ### 5. 删除容器
 
 ```bash
