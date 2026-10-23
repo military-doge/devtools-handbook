@@ -103,7 +103,29 @@ sudo systemctl stop docker      # 停止
 sudo systemctl status docker    # 查看状态
 ```
 
-## 六、卸载
+## 六、图形面板（Portainer）
+
+无头主机没有桌面，图形面板通过浏览器远程管理容器，能显著提升日常效率。
+
+```bash
+docker volume create portainer_data
+docker run -d -p 9443:9443 --name portainer --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce:latest
+```
+
+浏览器打开 `https://<主机IP>:9443`，首次访问设置管理员密码。
+
+> 更安全的访问方式：把 `-p 9443:9443` 改为 `-p 127.0.0.1:9443:9443`，仅监听本机；本地执行 `ssh -L 9443:localhost:9443 user@host` 后，浏览器访问 `https://localhost:9443`。
+
+> 安全提示：挂载 `/var/run/docker.sock` 等价于 root 权限；不要将面板端口直接暴露公网。
+
+轻量替代：Dockge（专注 compose）、Cockpit（系统级面板）。
+
+官方文档：<https://docs.portainer.io/start/install-ce/server/docker/linux>
+
+## 七、卸载
 
 ```bash
 # 卸载 Docker 相关软件包
