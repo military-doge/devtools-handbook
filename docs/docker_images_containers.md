@@ -115,22 +115,22 @@ docker rm -f <实例名>    # 强制删除运行中的容器
 # 拉取镜像
 docker pull debian:12
 
-# 后台启动一个保持运行的容器
-docker run -d --name debian-sleeper debian:12 sleep infinity
+# 后台以交互模式运行，bash 保持前台，容器常驻
+docker run -dit --name debian-run debian:12 bash
 
 # 查看状态
 docker ps
 
 # 进入容器
-docker exec -it debian-sleeper bash
+docker exec -it debian-run bash
 
 # 停止、启动
-docker stop debian-sleeper
-docker start debian-sleeper
+docker stop debian-run
+docker start debian-run
 
 # 删除容器与镜像
-docker rm -f debian-sleeper
+docker rm -f debian-run
 docker rmi debian:12
 ```
 
-Debian 镜像默认执行完命令就退出，所以后台运行时需要一个持续命令（如 `sleep infinity`），否则 `docker ps` 看不到它。
+`-dit` 中 `-d` 让容器后台运行，`-it` 保留交互终端，bash 一直等待输入，容器因此保持运行；若只写 `-d` 执行一次性命令，容器会立即退出。
