@@ -3,6 +3,44 @@
 > 官方手册：<https://man.openbsd.org/ssh_config>
 > 适用于 Linux / macOS / Windows（WSL）
 
+## 前置：Tailscale 组网
+
+服务器没有公网 IP、或不想向公网暴露 22 端口时，先用 Tailscale 把设备接入同一个虚拟内网。每台设备获得一个 `100.x.y.z` 地址，彼此可直连，流量端到端加密。
+
+Linux 服务器安装并登录：
+
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+```
+
+Windows / macOS 安装官方客户端，登录同一账号即可。查看本机地址与在线设备：
+
+```bash
+tailscale ip -4
+tailscale status
+```
+
+之后直接通过虚拟地址 SSH，无需端口映射或公网 IP：
+
+```bash
+ssh user@100.x.y.z
+```
+
+启用 MagicDNS 后可用设备名代替地址：
+
+```bash
+ssh user@hostname
+```
+
+也可以启用 Tailscale SSH，由 Tailscale 校验身份，免去公钥分发：
+
+```bash
+sudo tailscale up --ssh
+```
+
+> 官方文档：<https://tailscale.com/kb/1017/install>
+
 ## 一、生成密钥
 
 ```bash
@@ -154,4 +192,5 @@ ssh-add ~/.ssh/id_ed25519
 | `Permission denied (publickey)` | 公钥未上传或传到了错误用户；重新 `ssh-copy-id` |
 | `Host key verification failed` | 主机指纹变化：`ssh-keygen -R <host>`（非默认端口用 `ssh-keygen -R "[host]:2222"`），重连时核对指纹 |
 | 空闲后连接断开 | 客户端 `ServerAliveInterval`，或服务端 `ClientAliveInterval 60` |
+| `ssh 100.x.y.z` 超时 | `tailscale status` 确认对端在线；检查 ACL 是否放行；未直连时会走 DERP 中继，通常仍可连接 |
 | 改配置后失联 | 保留旧会话，另开窗口验证新配置再关闭旧会话 |
