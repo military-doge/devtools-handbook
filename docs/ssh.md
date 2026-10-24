@@ -95,8 +95,8 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... work-pc
 
 ```text
 Host <myserver>
-    HostName 192.0.2.10
-    User deploy
+    HostName <被控端IP>
+    User <被控端用户名>
     Port 22
     IdentityFile ~/.ssh/id_ed25519
 ```
@@ -104,7 +104,7 @@ Host <myserver>
 默认的连接命令：
 
 ```bash
-ssh deploy@192.0.2.10
+ssh <被控端用户名>@<被控端IP>
 ```
 
 配置后可用简写：
