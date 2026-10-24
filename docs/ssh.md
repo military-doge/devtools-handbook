@@ -58,6 +58,8 @@ sudo tailscale up --ssh
 
 ## 一、生成密钥
 
+密钥在控制端（你自己的电脑，通常是 Windows / macOS）生成，私钥留在本机，公钥交给服务器：
+
 ```bash
 ssh-keygen -t ed25519 -C "备注"
 ```
@@ -65,11 +67,16 @@ ssh-keygen -t ed25519 -C "备注"
 一路回车即可，默认生成：
 
 ```text
+Linux / macOS
 ~/.ssh/id_ed25519      # 私钥，留在本机
 ~/.ssh/id_ed25519.pub  # 公钥，交给服务器
+
+Windows
+C:\Users\<用户名>\.ssh\id_ed25519      # 私钥，留在本机
+C:\Users\<用户名>\.ssh\id_ed25519.pub  # 公钥，交给服务器
 ```
 
-可以设置 passphrase 保护私钥。确认权限：
+可以设置 passphrase 保护私钥。确认权限（Windows 默认即可，无需执行）：
 
 ```bash
 chmod 700 ~/.ssh
