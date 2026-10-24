@@ -107,7 +107,7 @@ Host <myserver>
 ssh <被控端用户名>@<被控端IP>
 ```
 
-配置后可用简写：
+也可用简写：
 
 ```bash
 ssh <myserver>
@@ -150,6 +150,13 @@ ssh -R 8080:localhost:80 <myserver>
 
 远端 `localhost:8080` 的请求转发到本机 80 端口。默认只绑定远端的回环地址，不对外开放。
 
+写入配置后 `ssh <myserver>` 同样自动建立：
+
+```text
+Host <myserver>
+    RemoteForward 8080 localhost:80
+```
+
 ### 3. 动态转发
 
 在本机开一个 SOCKS5 代理：
@@ -159,6 +166,26 @@ ssh -D 1080 <myserver>
 ```
 
 浏览器或系统代理填 `127.0.0.1:1080`，流量经 SSH 从远端出口发出。它只提供代理，不是全局 VPN。
+
+写入配置后 `ssh <myserver>` 同样自动建立：
+
+```text
+Host <myserver>
+    DynamicForward 1080
+```
+
+三种转发都可写进同一个 `Host` 段，每行一条，连接时一起生效：
+
+```text
+Host <myserver>
+    HostName <被控端IP>
+    User <被控端用户名>
+    LocalForward 9443 localhost:9443
+    RemoteForward 8080 localhost:80
+    DynamicForward 1080
+```
+
+之后每次只需 `ssh <myserver>`，无需再写 `-L` / `-R` / `-D`。
 
 ## 五、服务端配置
 
