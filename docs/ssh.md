@@ -54,6 +54,8 @@ ssh user@hostname
 sudo tailscale up --ssh
 ```
 
+> 安全提示：若怀疑任意一台已加入虚拟局域网的设备遭到入侵，除切断其网络连接外，也可在手机端登录 Tailscale 控制台，将该设备踢下线，立即阻断它对内网的访问。
+
 ## 一、生成密钥
 
 ```bash
