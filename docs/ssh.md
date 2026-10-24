@@ -130,14 +130,14 @@ Host *
 把远端服务映射到本机端口，例如远端仅监听 `127.0.0.1:9443` 的面板：
 
 ```bash
-ssh -L 9443:localhost:9443 <myserver>
+ssh -L 8443:localhost:9443 <myserver>   # 本机 8443 → 远端 localhost:9443
 ```
 
-浏览器访问 `https://localhost:9443`。写入配置后 `ssh <myserver>` 自动建立：
+浏览器访问 `https://localhost:8443`。写入配置后 `ssh <myserver>` 自动建立：
 
 ```text
 Host <myserver>
-    LocalForward 9443 localhost:9443
+    LocalForward 8443 localhost:9443
 ```
 
 ### 2. 远端转发
@@ -180,7 +180,7 @@ Host <myserver>
 Host <myserver>
     HostName <被控端IP>
     User <被控端用户名>
-    LocalForward 9443 localhost:9443
+    LocalForward 8443 localhost:9443
     RemoteForward 8080 localhost:80
     DynamicForward 1080
 ```
