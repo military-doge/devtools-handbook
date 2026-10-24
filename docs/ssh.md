@@ -94,14 +94,14 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... work-pc
 编辑 `~/.ssh/config`（Windows 为 `C:\Users\<用户名>\.ssh\config`）：
 
 ```text
-Host myserver
+Host <myserver>
     HostName 192.0.2.10
     User deploy
     Port 22
     IdentityFile ~/.ssh/id_ed25519
 ```
 
-之后 `ssh myserver` 等价于：
+之后 `ssh <myserver>` 等价于默认的 IP 连接：
 
 ```bash
 ssh -p 22 -i ~/.ssh/id_ed25519 deploy@192.0.2.10
@@ -124,13 +124,13 @@ Host *
 把远端服务映射到本机端口，例如远端仅监听 `127.0.0.1:9443` 的面板：
 
 ```bash
-ssh -L 9443:localhost:9443 myserver
+ssh -L 9443:localhost:9443 <myserver>
 ```
 
-浏览器访问 `https://localhost:9443`。写入配置后 `ssh myserver` 自动建立：
+浏览器访问 `https://localhost:9443`。写入配置后 `ssh <myserver>` 自动建立：
 
 ```text
-Host myserver
+Host <myserver>
     LocalForward 9443 localhost:9443
 ```
 
@@ -139,7 +139,7 @@ Host myserver
 反向：把本机服务暴露到远端。
 
 ```bash
-ssh -R 8080:localhost:80 myserver
+ssh -R 8080:localhost:80 <myserver>
 ```
 
 远端 `localhost:8080` 的请求转发到本机 80 端口。默认只绑定远端的回环地址，不对外开放。
@@ -149,7 +149,7 @@ ssh -R 8080:localhost:80 myserver
 在本机开一个 SOCKS5 代理：
 
 ```bash
-ssh -D 1080 myserver
+ssh -D 1080 <myserver>
 ```
 
 浏览器或系统代理填 `127.0.0.1:1080`，流量经 SSH 从远端出口发出。它只提供代理，不是全局 VPN。
@@ -194,7 +194,7 @@ ssh-add ~/.ssh/id_ed25519
 | 现象 | 原因与处理 |
 | --- | --- |
 | `Permissions 0755 ... are too open` | 私钥权限过宽：`chmod 600 ~/.ssh/id_ed25519` |
-| 仍提示输入密码 | `ssh -v myserver` 查看是否尝试公钥；确认服务端 `PubkeyAuthentication yes`、`authorized_keys` 权限 600、家目录不被组或其他用户写入 |
+| 仍提示输入密码 | `ssh -v <myserver>` 查看是否尝试公钥；确认服务端 `PubkeyAuthentication yes`、`authorized_keys` 权限 600、家目录不被组或其他用户写入 |
 | `Permission denied (publickey)` | 公钥未上传或传到了错误用户；重新 `ssh-copy-id` |
 | `Host key verification failed` | 主机指纹变化：`ssh-keygen -R <host>`（非默认端口用 `ssh-keygen -R "[host]:2222"`），重连时核对指纹 |
 | 空闲后连接断开 | 客户端 `ServerAliveInterval`，或服务端 `ClientAliveInterval 60` |
