@@ -78,22 +78,17 @@ C:\Users\<用户名>\.ssh\id_ed25519.pub  # 公钥，交给服务器
 
 ## 二、上传公钥
 
+目标只有一个：把公钥内容放进服务器的 `~/.ssh/authorized_keys`，每行一把公钥。
+
+本机能直接 SSH 到服务器时：
+
 ```bash
 ssh-copy-id -i ~/.ssh/id_ed25519.pub user@host
 ```
 
-非默认端口：
+非默认端口加 `-p 2222`。
 
-```bash
-ssh-copy-id -p 2222 -i ~/.ssh/id_ed25519.pub user@host
-```
-
-服务器没有 `ssh-copy-id` 时手动追加：
-
-```bash
-cat ~/.ssh/id_ed25519.pub | ssh -p 2222 user@host \
-  'mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'
-```
+至于个人电脑还是云服务器，按各自可行的方式处理即可：本机直接执行上面的命令；云服务器可通过控制台 Web 终端登录后手动追加，或在创建实例时直接注入公钥。
 
 始终只上传 `.pub` 公钥，私钥不要离开本机。
 
