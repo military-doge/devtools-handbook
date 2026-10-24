@@ -85,7 +85,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... me@laptop
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... work-pc
 ```
 
-个人电脑和云服务器按各自可行的方式处理即可，例如云服务器可通过控制台 Web 终端登录后手动追加，或在创建实例时直接注入公钥。
+公钥具体如何传到受控端保存，根据个人电脑或云服务器的具体情况处理。
 
 始终只上传 `.pub` 公钥，私钥不要离开本机。
 
