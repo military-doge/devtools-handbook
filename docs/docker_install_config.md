@@ -139,12 +139,12 @@ Host <myserver>
     HostName <被控端IP>
     User <被控端用户名>
     Port <端口>
-    LocalForward 8443 localhost:9443
+    LocalForward <本地端口> localhost:9443
 ```
 
-之后执行 `ssh <myserver>` 即可，隧道自动带上。浏览器打开 `https://localhost:8443`。
+之后执行 `ssh <myserver>` 即可，隧道自动带上。浏览器打开 `https://localhost:<本地端口>`。
 
-控制端 `localhost:8443` 的流量经 SSH 加密转发到主机的 `9443` 回环地址，访问权限等同 SSH 登录权限。
+控制端 `localhost:<本地端口>` 的流量经 SSH 加密转发到主机的 `9443` 回环地址，访问权限等同 SSH 登录权限。
 
 ### 3. 初始化账号
 

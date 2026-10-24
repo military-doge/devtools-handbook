@@ -127,17 +127,17 @@ Host *
 
 ### 1. 本地转发
 
-把远端服务映射到本机端口，例如远端仅监听 `127.0.0.1:9443` 的面板：
+把远端服务映射到本机端口，例如远端仅监听 `127.0.0.1:<远端端口>` 的面板：
 
 ```bash
-ssh -L 8443:localhost:9443 <myserver>   # 本机 8443 → 远端 localhost:9443
+ssh -L <本地端口>:localhost:<远端端口> <myserver>   # 本机端口 → 远端端口
 ```
 
-浏览器访问 `https://localhost:8443`。写入配置后 `ssh <myserver>` 自动建立：
+浏览器访问 `https://localhost:<本地端口>`。写入配置后 `ssh <myserver>` 自动建立：
 
 ```text
 Host <myserver>
-    LocalForward 8443 localhost:9443
+    LocalForward <本地端口> localhost:<远端端口>
 ```
 
 ### 2. 远端转发
@@ -145,16 +145,16 @@ Host <myserver>
 反向：把本机服务暴露到远端。
 
 ```bash
-ssh -R 8080:localhost:80 <myserver>
+ssh -R <远端监听端口>:localhost:<本机端口> <myserver>
 ```
 
-远端 `localhost:8080` 的请求转发到本机 80 端口。默认只绑定远端的回环地址，不对外开放。
+远端 `localhost:<远端监听端口>` 的请求转发到本机 `<本机端口>`。默认只绑定远端的回环地址，不对外开放。
 
 写入配置后 `ssh <myserver>` 同样自动建立：
 
 ```text
 Host <myserver>
-    RemoteForward 8080 localhost:80
+    RemoteForward <远端监听端口> localhost:<本机端口>
 ```
 
 ### 3. 动态转发
@@ -162,16 +162,16 @@ Host <myserver>
 在本机开一个 SOCKS5 代理：
 
 ```bash
-ssh -D 1080 <myserver>
+ssh -D <SOCKS端口> <myserver>
 ```
 
-浏览器或系统代理填 `127.0.0.1:1080`，流量经 SSH 从远端出口发出。它只提供代理，不是全局 VPN。
+浏览器或系统代理填 `127.0.0.1:<SOCKS端口>`，流量经 SSH 从远端出口发出。它只提供代理，不是全局 VPN。
 
 写入配置后 `ssh <myserver>` 同样自动建立：
 
 ```text
 Host <myserver>
-    DynamicForward 1080
+    DynamicForward <SOCKS端口>
 ```
 
 三种转发都可写进同一个 `Host` 段，每行一条，连接时一起生效：
@@ -180,9 +180,9 @@ Host <myserver>
 Host <myserver>
     HostName <被控端IP>
     User <被控端用户名>
-    LocalForward 8443 localhost:9443
-    RemoteForward 8080 localhost:80
-    DynamicForward 1080
+    LocalForward <本地端口> localhost:<远端端口>
+    RemoteForward <远端监听端口> localhost:<本机端口>
+    DynamicForward <SOCKS端口>
 ```
 
 之后每次只需 `ssh <myserver>`，无需再写 `-L` / `-R` / `-D`。
