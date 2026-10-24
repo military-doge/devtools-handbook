@@ -76,14 +76,6 @@ C:\Users\<用户名>\.ssh\id_ed25519      # 私钥，留在本机
 C:\Users\<用户名>\.ssh\id_ed25519.pub  # 公钥，交给服务器
 ```
 
-可以设置 passphrase 保护私钥。确认权限（Windows 默认即可，无需执行）：
-
-```bash
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/id_ed25519
-chmod 644 ~/.ssh/id_ed25519.pub
-```
-
 ## 二、上传公钥
 
 ```bash
