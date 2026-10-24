@@ -101,10 +101,16 @@ Host <myserver>
     IdentityFile ~/.ssh/id_ed25519
 ```
 
-之后 `ssh <myserver>` 等价于默认的 IP 连接：
+默认的连接命令：
 
 ```bash
 ssh -p 22 -i ~/.ssh/id_ed25519 deploy@192.0.2.10
+```
+
+配置后可用简写：
+
+```bash
+ssh <myserver>
 ```
 
 多台机器各写一段 `Host`。公共选项可用通配段统一设置，放在文件末尾：
