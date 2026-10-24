@@ -135,13 +135,14 @@ docker run -d -p 127.0.0.1:9443:9443 --name portainer --restart=always \
 在控制端的 SSH 配置文件中添加（Windows：`C:\Users\<用户名>\.ssh\config`；Linux/macOS：`~/.ssh/config`）：
 
 ```text
-Host <服务器IP>
-    User <用户名>
+Host <myserver>
+    HostName <被控端IP>
+    User <被控端用户名>
     Port <端口>
     LocalForward 9443 localhost:9443
 ```
 
-之后执行 `ssh <用户名>@<服务器IP>` 即可，隧道自动带上。浏览器打开 `https://localhost:9443`。
+之后执行 `ssh <myserver>` 即可，隧道自动带上。浏览器打开 `https://localhost:9443`。
 
 控制端 `localhost:9443` 的流量经 SSH 加密转发到主机的回环地址，访问权限等同 SSH 登录权限。
 
