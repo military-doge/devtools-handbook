@@ -78,9 +78,9 @@ C:\Users\<用户名>\.ssh\id_ed25519.pub  # 公钥，交给服务器
 
 ## 二、上传公钥
 
-目标只有一个：把公钥内容放进服务器的 `~/.ssh/authorized_keys`。
+把公钥内容放进服务器的 `~/.ssh/authorized_keys`。
 
-它是纯文本文件，一行一把公钥，格式和 `.pub` 文件一致：
+它是纯文本文件，每个公钥单独一行，格式和 `.pub` 文件一致：
 
 ```text
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... me@laptop
