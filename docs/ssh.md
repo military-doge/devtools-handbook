@@ -125,111 +125,50 @@ Host *
 
 ## 四、端口转发
 
-### 1. 本地转发
+### 本地转发
 
-把远端服务映射到本机端口，例如远端仅监听 `127.0.0.1:<远端端口>` 的面板：
+有些服务只在服务器内部监听 `127.0.0.1:<远端端口>`，不对公网开放。
 
-```bash
-ssh -L <本地端口>:localhost:<远端端口> <myserver>   # 本机端口 → 远端端口
-```
-
-浏览器访问 `https://localhost:<本地端口>`。写入配置后 `ssh <myserver>` 自动建立：
-
-```text
-Host <myserver>
-    LocalForward <本地端口> localhost:<远端端口>
-```
-
-### 2. 远端转发
-
-反向：把本机服务暴露到远端。
+SSH 本地转发可以把该端口映射到本机，每次执行 `ssh` 时手动带上转发参数：
 
 ```bash
-ssh -R <远端监听端口>:localhost:<本机端口> <myserver>
+ssh -L <本地端口>:localhost:<远端端口> <myserver>
 ```
 
-远端 `localhost:<远端监听端口>` 的请求转发到本机 `<本机端口>`。默认只绑定远端的回环地址，不对外开放。
-
-写入配置后 `ssh <myserver>` 同样自动建立：
-
-```text
-Host <myserver>
-    RemoteForward <远端监听端口> localhost:<本机端口>
-```
-
-### 3. 动态转发
-
-在本机开一个 SOCKS5 代理：
-
-```bash
-ssh -D <SOCKS端口> <myserver>
-```
-
-浏览器或系统代理填 `127.0.0.1:<SOCKS端口>`，流量经 SSH 从远端出口发出。它只提供代理，不是全局 VPN。
-
-写入配置后 `ssh <myserver>` 同样自动建立：
-
-```text
-Host <myserver>
-    DynamicForward <SOCKS端口>
-```
-
-三种转发都可写进同一个 `Host` 段，每行一条，连接时一起生效：
+常用做法是写进 `~/.ssh/config`（Windows 为 `C:\Users\<用户名>\.ssh\config`）：
 
 ```text
 Host <myserver>
     HostName <被控端IP>
     User <被控端用户名>
     LocalForward <本地端口> localhost:<远端端口>
-    RemoteForward <远端监听端口> localhost:<本机端口>
-    DynamicForward <SOCKS端口>
 ```
 
-之后每次只需 `ssh <myserver>`，无需再写 `-L` / `-R` / `-D`。
+之后执行 `ssh <myserver>`，会自动带上主机、用户和转发参数。连接保持期间，控制端通过 `localhost:<本地端口>` 即可通过浏览器或其他客户端访问该服务。
 
 ## 五、服务端配置
 
-主配置为 `/etc/ssh/sshd_config`；Debian / Ubuntu 默认还会加载 `/etc/ssh/sshd_config.d/*.conf`，可把改动放进独立片段。
+编辑 `/etc/ssh/sshd_config`。
 
 常用项：
 
 ```text
-Port 22
-PermitRootLogin prohibit-password
-PasswordAuthentication no
-PubkeyAuthentication yes
+Port 22                              # SSH 监听端口
+PermitRootLogin prohibit-password    # root 禁止密码登录，仅允许公钥
+PasswordAuthentication no            # 禁用密码认证
+PubkeyAuthentication yes             # 启用公钥认证
 ```
+
+> 🔴 提示：禁用密码登录前，务必先确认公钥已能登录。
 
 修改后先校验再重启：
 
 ```bash
 sudo sshd -t
+
+# Debian / Ubuntu
 sudo systemctl restart ssh
+
+# RHEL / CentOS
+sudo systemctl restart sshd
 ```
-
-- 禁用密码登录前，先确认公钥已能登录。
-- 改端口后旧连接不受影响，用新端口验证成功再关闭当前会话。
-- 服务名：Debian / Ubuntu 为 `ssh`，RHEL / CentOS 为 `sshd`。
-
-## 六、ssh-agent
-
-私钥设置了 passphrase 时，用 agent 避免每次输入：
-
-```bash
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-```
-
-部分桌面环境会随登录自动启动 agent，若未运行则手动执行上面的命令。
-
-## 七、常见问题
-
-| 现象 | 原因与处理 |
-| --- | --- |
-| `Permissions 0755 ... are too open` | 私钥权限过宽：`chmod 600 ~/.ssh/id_ed25519` |
-| 仍提示输入密码 | `ssh -v <myserver>` 查看是否尝试公钥；确认服务端 `PubkeyAuthentication yes`、`authorized_keys` 权限 600、家目录不被组或其他用户写入 |
-| `Permission denied (publickey)` | 公钥未上传或传到了错误用户；重新 `ssh-copy-id` |
-| `Host key verification failed` | 主机指纹变化：`ssh-keygen -R <host>`（非默认端口用 `ssh-keygen -R "[host]:2222"`），重连时核对指纹 |
-| 空闲后连接断开 | 客户端 `ServerAliveInterval`，或服务端 `ClientAliveInterval 60` |
-| `ssh 100.x.y.z` 超时 | `tailscale status` 确认对端在线；检查 ACL 是否放行；未直连时会走 DERP 中继，通常仍可连接 |
-| 改配置后失联 | 保留旧会话，另开窗口验证新配置再关闭旧会话 |
