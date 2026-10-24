@@ -104,7 +104,7 @@ Host <myserver>
 默认的连接命令：
 
 ```bash
-ssh -p 22 -i ~/.ssh/id_ed25519 deploy@192.0.2.10
+ssh deploy@192.0.2.10
 ```
 
 配置后可用简写：
