@@ -78,7 +78,16 @@ C:\Users\<用户名>\.ssh\id_ed25519.pub  # 公钥，交给服务器
 
 ## 二、上传公钥
 
-目标只有一个：把公钥内容放进服务器的 `~/.ssh/authorized_keys`，每行一把公钥。
+目标只有一个：把公钥内容放进服务器的 `~/.ssh/authorized_keys`。
+
+它是纯文本文件，一行一把公钥，格式和 `.pub` 文件一致：
+
+```text
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... me@laptop
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... work-pc
+```
+
+每行结构为 `<密钥类型> <Base64 公钥> [注释]`。追加一行就增加一把可用密钥，删除一行即吊销；文件建议 `600`，所在目录 `~/.ssh` 为 `700`。行首还可加 `from="203.0.113.10"` 等选项限制来源。
 
 本机能直接 SSH 到服务器时：
 
