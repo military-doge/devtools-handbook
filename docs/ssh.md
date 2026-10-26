@@ -85,9 +85,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... me@laptop
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... work-pc
 ```
 
-公钥具体如何传到受控端保存，根据个人电脑或云服务器的具体情况处理。
-
-始终只上传 `.pub` 公钥，私钥不要离开本机。
+公钥如何传到服务器视具体环境而定，始终只上传 `.pub` 公钥，私钥不要离开本机。
 
 ## 三、客户端配置
 
@@ -95,21 +93,16 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... work-pc
 
 ```text
 Host <myserver>
-    HostName <被控端IP>
-    User <被控端用户名>
+    HostName <受控端IP>
+    User <受控端用户名>
     Port 22
     IdentityFile ~/.ssh/id_ed25519
 ```
 
-默认的连接命令：
+配置好后，以下两种方式等效：
 
 ```bash
-ssh <被控端用户名>@<被控端IP>
-```
-
-也可用简写：
-
-```bash
+ssh <受控端用户名>@<受控端IP>
 ssh <myserver>
 ```
 
@@ -123,9 +116,16 @@ Host *
 
 `ServerAliveInterval` 每 60 秒发一次心跳，连续 3 次无响应才断开，避免空闲掉线。
 
-## 四、端口转发
+## 四、VSCode 远程开发
 
-### 本地转发
+VSCode 通过 `Remote - SSH` 扩展直接复用上一步的 `~/.ssh/config`，主机、用户、端口、私钥都不必在插件里重复填写。
+
+1. 控制端在扩展市场安装 `Remote - SSH`（`ms-vscode-remote.remote-ssh`）。
+2. 按 `Ctrl+Shift+P` 打开命令面板，执行 `Remote-SSH: Connect to Host`，选择 `config` 中的 `Host` 别名（如 `<myserver>`）。也可点击左下角的远程指示器选择连接到主机。
+3. 首次连接会询问远端平台，按服务器实际系统选择（通常为 `Linux`），VSCode 自动在服务器安装服务端组件。
+4. 连接成功后打开远端目录，之后的文件编辑、终端、调试都在服务器上执行。
+
+## 五、端口转发
 
 有些服务只在服务器内部监听 `127.0.0.1:<远端端口>`，不对公网开放。
 
@@ -139,14 +139,14 @@ ssh -L <本地端口>:localhost:<远端端口> <myserver>
 
 ```text
 Host <myserver>
-    HostName <被控端IP>
-    User <被控端用户名>
+    HostName <受控端IP>
+    User <受控端用户名>
     LocalForward <本地端口> localhost:<远端端口>
 ```
 
-之后执行 `ssh <myserver>`，会自动带上主机、用户和转发参数。连接保持期间，控制端通过 `localhost:<本地端口>` 即可通过浏览器或其他客户端访问该服务。
+之后执行 `ssh <myserver>`，会自动带上主机、用户和转发参数。连接保持期间，在控制端用浏览器或其他客户端访问 `localhost:<本地端口>` 即可。
 
-## 五、服务端配置
+## 六、服务端配置
 
 编辑 `/etc/ssh/sshd_config`。
 
