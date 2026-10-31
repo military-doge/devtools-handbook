@@ -47,7 +47,7 @@ sudo mkdir /srv/vaultwarden
 cd /srv/vaultwarden
 ```
 
-这里只创建项目目录；`vw_data`、`db_data` 会在首次 `docker compose up -d` 时由 Docker 自动创建，分别存放 Vaultwarden 的附件/密钥/配置和 PostgreSQL 数据。
+这里只创建项目目录；`vw_data`、`db_data` 会在首次 `docker compose up -d` 时由 Docker 自动创建。
 
 ### 2. 编写 compose.yaml
 
@@ -104,24 +104,13 @@ services:
       retries: 5
 ```
 
-配置说明：
-
-- `ports`：容器内监听 `80`，主机只绑定 `127.0.0.1:8080`。HTTPS 由 Tailscale Serve 终止，密码管理服务本身不直接暴露到 `0.0.0.0`。
-- `DOMAIN`：客户端最终访问的地址，影响附件、WebSocket 等链接。从 `.env` 读取，填写 Tailscale Serve 生成的 `https://...ts.net` 地址，必须与实际访问地址一致。
-- `ADMIN_TOKEN`：`/admin` 管理页面的登录令牌，从 `.env` 读取，不要写死在 YAML 里。
-- `SIGNUPS_ALLOWED`：是否允许自助注册。首次注册完账号后应改为 `"false"`。
-- `DATABASE_URL`：连接串中的 `db:5432` 用 Compose 网络里的服务名解析，无需知道容器 IP；密码从 `.env` 插值，需做 URL 编码，用 `openssl rand -hex` 生成可避开特殊字符。
-- `depends_on`：等 `db` 的健康检查通过后再启动 Vaultwarden，避免数据库未就绪导致应用启动失败。
-- `db` 没有写 `ports`：数据库只在 Compose 内部网络可达，不会暴露到主机。
-- `db` 的卷挂在 `/var/lib/postgresql`：`postgres:18` 的默认数据目录是 `/var/lib/postgresql/18/docker`，17 及更早版本才是 `/var/lib/postgresql/data`。
-
 ### 3. 配置访问地址、生成令牌并启动
 
 Vaultwarden 的 Web 前端要求所有 API 请求走 HTTPS，直接用 `http://localhost:8080` 会报 `Insecure URL not allowed. All URLs must use HTTPS.`，无法登录。这里用 Tailscale Serve 终止 TLS，容器仍只监听本机回环。
 
 在浏览器登录 [Tailscale Console](https://login.tailscale.com/)，进入左侧 **DNS** 页面：先确认 **MagicDNS** 已启用（HTTPS Certificates 依赖它），再启用 **HTTPS Certificates**。启用时会提示证书域名会写入公开的证书透明度日志、可能泄露设备名，确认无该类问题后启用即可。
 
-启动 Serve 拿到最终地址：
+启动 Serve 拿到地址：
 
 ```bash
 sudo tailscale serve --bg 8080
@@ -137,7 +126,7 @@ openssl rand -base64 48     # ADMIN_TOKEN
 openssl rand -hex 24        # POSTGRES_PASSWORD
 ```
 
-复制输出，创建并编辑 `.env`：
+创建并编辑 `.env`：
 
 ```bash
 sudo touch .env
@@ -166,34 +155,22 @@ docker compose ps
 浏览器打开 `.env` 中 `DOMAIN` 对应的 HTTPS 地址，完成第一个账号注册。这个账号只是实例的第一个用户，之后录入的条目都保存在它自己的加密保险库中；其他用户各有独立保险库，服务端和 `/admin` 只能管理账号，无法解密其中的内容。
 
 1. 手机、桌面客户端和浏览器扩展使用同一个 HTTPS 地址。
-2. Tailscale Serve 只在 tailnet 内提供服务，不会暴露公网。确实需要公网访问时再考虑 Funnel 或带 TLS 的反向代理，并额外做访问控制。
+2. Tailscale Serve 只在 tailnet 内提供服务，不会暴露公网。
 
-### 5. 备份与升级
+## 四、配置案例分析
 
-Vaultwarden 的附件、密钥与配置在 `/srv/vaultwarden/vw_data`，先停服务再打包，避免写入过程中备份不一致：
+以第三节的 `docker-compose.yaml` 为例，逐项说明各字段的作用：
 
-```bash
-docker compose stop vaultwarden
-sudo tar czf "vaultwarden-data-$(date +%F).tar.gz" -C /srv/vaultwarden vw_data
-docker compose start vaultwarden
-```
+- `ports`：容器内监听 `80`，主机只绑定 `127.0.0.1:8080`。HTTPS 由 Tailscale Serve 终止，密码管理服务本身不直接暴露到 `0.0.0.0`。
+- `DOMAIN`：客户端最终访问的地址，影响附件、WebSocket 等链接。从 `.env` 读取，填写 Tailscale Serve 生成的 `https://...ts.net` 地址，必须与实际访问地址一致。
+- `ADMIN_TOKEN`：`/admin` 管理页面的登录令牌，从 `.env` 读取，不要写死在 YAML 里。
+- `SIGNUPS_ALLOWED`：是否允许自助注册。首次注册完账号后应改为 `"false"`。
+- `DATABASE_URL`：连接串中的 `db:5432` 用 Compose 网络里的服务名解析，无需知道容器 IP；密码从 `.env` 插值，需做 URL 编码，用 `openssl rand -hex` 生成可避开特殊字符。
+- `depends_on`：等 `db` 的健康检查通过后再启动 Vaultwarden，避免数据库未就绪导致应用启动失败。
+- `db` 没有写 `ports`：数据库只在 Compose 内部网络可达，不会暴露到主机。
+- `db` 的卷挂在 `/var/lib/postgresql`：`postgres:18` 的默认数据目录是 `/var/lib/postgresql/18/docker`，17 及更早版本才是 `/var/lib/postgresql/data`。
 
-PostgreSQL 使用逻辑备份，不要把运行中的 `db_data` 数据目录直接打包：
-
-```bash
-docker compose exec -T db pg_dump -U vaultwarden vaultwarden | gzip > vaultwarden-db-$(date +%F).sql.gz
-```
-
-升级镜像：
-
-```bash
-docker compose pull
-docker compose up -d
-```
-
-数据目录在宿主机上，重建容器不会影响数据。升级前先完成上面两项备份：Vaultwarden 的数据库结构升级后通常不能回退到旧版本。
-
-## 四、常用字段
+## 五、常用字段
 
 | 字段 | 说明 |
 | --- | --- |
@@ -216,7 +193,7 @@ docker compose up -d
 - 单实例场景可写 `container_name` 方便记忆；需要扩容或多副本时不要写，否则端口和名称会冲突。
 - `env_file` 只把文件内容注入容器，不参与 YAML 插值，与 `.env` 的区别见下一节。
 
-## 五、环境变量
+## 六、环境变量
 
 两种变量来源经常混淆：
 
@@ -234,7 +211,7 @@ environment:
 
 `:-` 在变量为空时使用默认值，`:?` 在变量缺失时直接报错并停止。`.env` 常含密码或令牌，不要提交到 Git；仓库里可保留一份 `.env.example` 作为模板。
 
-## 六、常用命令
+## 七、常用命令
 
 ```bash
 docker compose up -d                     # 创建并后台启动
@@ -257,7 +234,7 @@ docker compose down -v                   # 同时删除命名卷（绑定挂载�
 
 > 🔴 本例使用绑定挂载，`docker compose down -v` 不会删除 `/srv/vaultwarden/vw_data` 和 `/srv/vaultwarden/db_data`。但直接删除 `/srv/vaultwarden` 会连数据一起删掉，清理前先确认已备份。
 
-## 七、卷与网络
+## 八、卷与网络
 
 - `volumes` 的绝对路径是绑定挂载，需要提前创建并保证可写；也可以写成 `./data`（相对 Compose 文件目录），或用 `vw_data:/data` 交给 Docker 管理为命名卷。
 - 命名卷由 Docker 统一存放在 `/var/lib/docker/volumes/<项目名>_<卷名>`，不用关心宿主机路径。
@@ -268,7 +245,7 @@ docker compose down -v                   # 同时删除命名卷（绑定挂载�
 - 同一项目内的服务默认加入同一个网络，可直接用**服务名**互相访问；示例中的 `DATABASE_URL` 就是连接 `db:5432`，不需要发布数据库端口。
 - 需要访问项目外容器或固定网段时才声明自定义 `networks`，一般无需手动配置。
 
-## 八、使用建议
+## 九、使用建议
 
 - 镜像固定到具体版本，避免 `latest` 在重建时悄悄升级；升级前先备份数据目录和数据库。
 - Compose 文件与 `.env.example` 一起提交，实际 `.env` 加入 `.gitignore`。
