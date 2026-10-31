@@ -1,31 +1,11 @@
-# Docker 镜像与容器操作
+# Docker 容器操作
 
 > 官方 CLI 参考：<https://docs.docker.com/reference/cli/docker/>
+> 镜像的拉取、查看与删除见 [Docker 镜像](docker_images.md)。
 
-## 一、管理镜像
+容器是镜像的运行实例。同一个镜像可以创建多个互不影响的容器，容器内的修改默认不写回镜像。
 
-### 1. 拉取镜像
-
-```bash
-docker pull debian:12
-docker images          # 查看本地已下载的镜像
-```
-
-`docker pull debian:12` 拉取 Debian 12（bookworm）镜像；`docker images` 查看本地已有镜像。
-
-在 Docker Hub 查找镜像与标签，例如 Debian：<https://hub.docker.com/_/debian>。在页面 **Tags** 中选择所需版本。
-
-### 2. 删除镜像
-
-```bash
-docker rmi debian:12
-```
-
-镜像被容器占用时需先删除容器，或加 `-f` 强制删除。`-f` 只强制删除镜像，不会删除关联容器；被强制删除后，容器会保留但镜像引用变成 `<none>`。
-
-## 二、管理容器
-
-### 1. 创建实例
+## 一、创建实例
 
 交互式容器（退出后容器停止）：
 
@@ -47,7 +27,7 @@ docker run -d --name web -p 8080:80 nginx
 docker run -it --name debian-mount -v /home/user/data:/data debian:12 bash
 ```
 
-以上示例会分别创建 `debian-demo`、`web`、`debian-mount` 三个容器。
+以上示例会分别创建 `debian-demo`、`web`、`debian-mount` 三个容器。本地没有对应镜像时，`docker run` 会自动拉取。
 
 `-v 主机路径:容器路径` 表示把主机目录挂载到容器：冒号左边必须是主机上**已存在**的目录；冒号右边的容器路径由 Docker 在实例化时**自动创建**。两者指向同一份数据，任一侧修改，另一侧立即可见。
 
@@ -74,7 +54,7 @@ docker run -it --name debian-mount -v /home/user/data:/data debian:12 bash
 
 宿主机重启后的自动拉起，依赖 Docker 守护进程开机自启（`systemctl enable docker`）。
 
-### 2. 查看状态
+## 二、查看状态
 
 ```bash
 docker ps                 # 运行中的容器
@@ -84,7 +64,7 @@ docker logs <实例名>       # 容器日志
 docker stats              # 实时资源占用
 ```
 
-### 3. 启动 / 停止 / 重启
+## 三、启动 / 停止 / 重启
 
 ```bash
 docker stop <实例名>
@@ -94,7 +74,7 @@ docker restart <实例名>
 
 `start` 只启动已存在但停止的容器，不能创建新容器。
 
-### 4. 进入运行中的容器
+## 四、进入运行中的容器
 
 在容器内新开一个 shell（推荐）：
 
@@ -114,7 +94,7 @@ docker exec -u root <实例名> whoami        # 以 root 身份执行
 
 这种执行方式不需要 `-it`；只有命令本身需要交互（如 `bash`、`vim`）时才加。
 
-#### attach 与 exec 的区别
+### attach 与 exec 的区别
 
 容器里 PID 1 的进程决定容器的生死。`docker attach` 接入的正是这个主进程：
 
@@ -125,14 +105,14 @@ docker attach <实例名>
 - `attach`：你的键盘直接接到主进程上。`exit` 或 `Ctrl+C` 会结束主进程，容器随之停止；`Ctrl+P` `Ctrl+Q` 可脱离而容器继续运行。主进程需以 `-it` 启动、且会读取 stdin，交互才方便。
 - `exec`：在容器内另开一个进程，与主进程互不影响。`exit` 只关掉这个新进程，容器照常运行，日常排查更推荐。
 
-### 5. 删除容器
+## 五、删除容器
 
 ```bash
 docker rm <实例名>       # 删除已停止的容器
 docker rm -f <实例名>    # 强制删除运行中的容器
 ```
 
-## 三、完整示例（Debian）
+## 六、完整示例（Debian）
 
 ```bash
 # 拉取镜像
@@ -151,9 +131,10 @@ docker exec -it debian-run bash
 docker stop debian-run
 docker start debian-run
 
-# 删除容器与镜像
+# 删除容器
 docker rm -f debian-run
-docker rmi debian:12
 ```
 
 `-dit` 中 `-d` 让容器后台运行，`-it` 保留交互终端，bash 一直等待输入，容器因此保持运行；若只写 `-d` 执行一次性命令，容器会立即退出。
+
+多容器、需要固定配置的场景，建议改用 [Docker Compose](docker_compose.md) 编排，避免每次手写长命令。

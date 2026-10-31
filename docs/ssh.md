@@ -116,16 +116,7 @@ Host *
 
 `ServerAliveInterval` 每 60 秒发一次心跳，连续 3 次无响应才断开，避免空闲掉线。
 
-## 四、VSCode 远程开发
-
-VSCode 通过 `Remote - SSH` 扩展直接复用上一步的 `~/.ssh/config`，主机、用户、端口、私钥都不必在插件里重复填写。
-
-1. 控制端在扩展市场安装 `Remote - SSH`（`ms-vscode-remote.remote-ssh`）。
-2. 按 `Ctrl+Shift+P` 打开命令面板，执行 `Remote-SSH: Connect to Host`，选择 `config` 中的 `Host` 别名（如 `<myserver>`）。也可点击左下角的远程指示器选择连接到主机。
-3. 首次连接会询问远端平台，按服务器实际系统选择（通常为 `Linux`），VSCode 自动在服务器安装服务端组件。
-4. 连接成功后打开远端目录，之后的文件编辑、终端、调试都在服务器上执行。
-
-## 五、端口转发
+## 四、端口转发
 
 有些服务只在服务器内部监听 `127.0.0.1:<远端端口>`，不对公网开放。
 
@@ -146,7 +137,7 @@ Host <myserver>
 
 之后执行 `ssh <myserver>`，会自动带上主机、用户和转发参数。连接保持期间，在控制端用浏览器或其他客户端访问 `localhost:<本地端口>` 即可。
 
-## 六、服务端配置
+## 五、服务端配置
 
 编辑 `/etc/ssh/sshd_config`。
 
@@ -172,3 +163,12 @@ sudo systemctl restart ssh
 # RHEL / CentOS
 sudo systemctl restart sshd
 ```
+
+## 六、VSCode 远程开发
+
+VSCode 通过 `Remote - SSH` 扩展直接复用客户端配置中的 `~/.ssh/config`，主机、用户、端口、私钥都不必在插件里重复填写。
+
+1. 控制端在扩展市场安装 `Remote - SSH`（`ms-vscode-remote.remote-ssh`）。
+2. 按 `Ctrl+Shift+P` 打开命令面板，执行 `Remote-SSH: Connect to Host`，选择 `config` 中的 `Host` 别名（如 `<myserver>`）。也可点击左下角的远程指示器选择连接到主机。
+3. 首次连接会询问远端平台，按服务器实际系统选择（通常为 `Linux`），VSCode 自动在服务器安装服务端组件。
+4. 连接成功后打开远端目录，之后的文件编辑、终端、调试都在服务器上执行。
