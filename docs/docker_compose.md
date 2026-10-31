@@ -70,7 +70,7 @@ services:
     ports:
       - "127.0.0.1:8080:80"
     environment:
-      DOMAIN: "https://<主机名>.<tailnet>.ts.net"
+      DOMAIN: ${DOMAIN:?请在 .env 中设置 DOMAIN}
       ADMIN_TOKEN: ${ADMIN_TOKEN:?请在 .env 中设置 ADMIN_TOKEN}
       SIGNUPS_ALLOWED: "true"
       DATABASE_URL: "postgresql://vaultwarden:${POSTGRES_PASSWORD:?请在 .env 中设置 POSTGRES_PASSWORD}@db:5432/vaultwarden"
@@ -107,16 +107,30 @@ services:
 配置说明：
 
 - `ports`：容器内监听 `80`，主机只绑定 `127.0.0.1:8080`。HTTPS 由 Tailscale Serve 终止，密码管理服务本身不直接暴露到 `0.0.0.0`。
-- `DOMAIN`：客户端最终访问的地址，影响附件、WebSocket 等链接。这里填写 Tailscale Serve 生成的 `https://...ts.net` 地址，必须与实际访问地址一致。
+- `DOMAIN`：客户端最终访问的地址，影响附件、WebSocket 等链接。从 `.env` 读取，填写 Tailscale Serve 生成的 `https://...ts.net` 地址，必须与实际访问地址一致。
 - `ADMIN_TOKEN`：`/admin` 管理页面的登录令牌，从 `.env` 读取，不要写死在 YAML 里。
 - `SIGNUPS_ALLOWED`：是否允许自助注册。首次注册完账号后应改为 `"false"`。
-- `DATABASE_URL`：连接串中的 `db:5432` 用 Compose 网络里的服务名解析，无需知道容器 IP；密码从 `.env` 插值。
+- `DATABASE_URL`：连接串中的 `db:5432` 用 Compose 网络里的服务名解析，无需知道容器 IP；密码从 `.env` 插值，需做 URL 编码，用 `openssl rand -hex` 生成可避开特殊字符。
 - `depends_on`：等 `db` 的健康检查通过后再启动 Vaultwarden，避免数据库未就绪导致应用启动失败。
 - `db` 没有写 `ports`：数据库只在 Compose 内部网络可达，不会暴露到主机。
+- `db` 的卷挂在 `/var/lib/postgresql`：`postgres:18` 的默认数据目录是 `/var/lib/postgresql/18/docker`，17 及更早版本才是 `/var/lib/postgresql/data`。
 
-### 3. 生成管理令牌并启动
+### 3. 配置访问地址、生成令牌并启动
 
-先生成两个随机值，分别用于管理面板令牌和数据库密码：
+Vaultwarden 的 Web 前端要求所有 API 请求走 HTTPS，直接用 `http://localhost:8080` 会报 `Insecure URL not allowed. All URLs must use HTTPS.`，无法登录。这里用 Tailscale Serve 终止 TLS，容器仍只监听本机回环。
+
+在浏览器登录 [Tailscale Console](https://login.tailscale.com/)，进入左侧 **DNS** 页面：先确认 **MagicDNS** 已启用（HTTPS Certificates 依赖它），再启用 **HTTPS Certificates**。启用时会提示证书域名会写入公开的证书透明度日志、可能泄露设备名，确认无该类问题后启用即可。
+
+启动 Serve 拿到最终地址：
+
+```bash
+sudo tailscale serve --bg 8080
+tailscale serve status
+```
+
+输出中的地址形如 `https://<主机名>.<tailnet>.ts.net`，稍后写入 `.env`。证书自动签发和续期，且只在 tailnet 内可见。Serve 配置会持久化，重启后仍然有效；不再需要时用 `tailscale serve reset` 清除。
+
+再生成两个随机值，分别用于管理面板令牌和数据库密码：
 
 ```bash
 openssl rand -base64 48     # ADMIN_TOKEN
@@ -130,12 +144,15 @@ sudo touch .env
 sudo nano .env
 ```
 
-写入两行并保存退出（`=` 两边不要有空格，值不要折行）：
+写入三行并保存退出（`=` 两边不要有空格，值不要折行）：
 
 ```ini
 ADMIN_TOKEN=<粘贴第一条输出>
 POSTGRES_PASSWORD=<粘贴第二条输出>
+DOMAIN=<粘贴 serve status 中的 https 地址>
 ```
+
+> 🔴 文件中的令牌、密码和地址不要提交到 Git，.env 中数据库密码一旦 compose 初始化服务后不要修改，否则后续无法登录，ADMIN_TOKEN可以修改，但是旧令牌可能还会保持有效一段时间，且登录需要新令牌。
 
 最后启动：
 
@@ -144,36 +161,12 @@ docker compose up -d
 docker compose ps
 ```
 
-> 🔴 文件中的令牌和密码不要提交到 Git，.env 中数据库密码一旦 compose 初始化服务后不要修改，否则后续无法登录，ADMIN_TOKEN可以修改，但是旧令牌可能还会保持有效一段时间，且登录需要新令牌。
+### 4. 首次访问与初始化
 
-### 4. 配置 HTTPS 并首次访问
+浏览器打开 `.env` 中 `DOMAIN` 对应的 HTTPS 地址，完成第一个账号注册。这个账号只是实例的第一个用户，之后录入的条目都保存在它自己的加密保险库中；其他用户各有独立保险库，服务端和 `/admin` 只能管理账号，无法解密其中的内容。
 
-Vaultwarden 的 Web 前端要求所有 API 请求走 HTTPS，直接用 `http://localhost:8080` 会报 `Insecure URL not allowed. All URLs must use HTTPS.`，无法登录。这里用 Tailscale Serve 终止 TLS，容器仍只监听本机回环。
-
-前置条件：服务器和访问设备都加入同一 tailnet，并在 Tailscale 管理后台的 **DNS** 页面启用 **MagicDNS** 和 **HTTPS Certificates**。
-
-启动 Serve：
-
-```bash
-tailscale serve --bg 8080
-tailscale serve status
-```
-
-输出中的地址形如 `https://<主机名>.<tailnet>.ts.net`。它会把 443 的 HTTPS 流量转发到本机 `127.0.0.1:8080`，证书自动签发和续期，且只在 tailnet 内可见。Serve 配置会持久化，重启后仍然有效；不再需要时用 `tailscale serve reset` 清除。
-
-把 `docker-compose.yaml` 中的 `DOMAIN` 改成这个地址，然后重建：
-
-```bash
-docker compose up -d
-docker compose ps
-```
-
-浏览器打开该 HTTPS 地址，完成第一个账号注册。这个账号拥有全部数据。
-
-1. 注册完成后，把 `SIGNUPS_ALLOWED` 改为 `"false"`，再执行 `docker compose up -d` 生效，数据目录不受影响。
-2. 需要添加其他用户时，访问 `https://<主机名>.<tailnet>.ts.net/admin`，粘贴 `.env` 中的 `ADMIN_TOKEN` 登录，通过邀请方式添加。
-3. 手机、桌面客户端和浏览器扩展使用同一个 HTTPS 地址，设备需要加入同一 tailnet。不要填写 `http://` 或 `localhost` 地址。
-4. Tailscale Serve 只在 tailnet 内提供服务，不会暴露公网。确实需要公网访问时再考虑 Funnel 或带 TLS 的反向代理，并额外做访问控制。
+1. 手机、桌面客户端和浏览器扩展使用同一个 HTTPS 地址。
+2. Tailscale Serve 只在 tailnet 内提供服务，不会暴露公网。确实需要公网访问时再考虑 Funnel 或带 TLS 的反向代理，并额外做访问控制。
 
 ### 5. 备份与升级
 
@@ -200,7 +193,7 @@ docker compose up -d
 
 数据目录在宿主机上，重建容器不会影响数据。升级前先完成上面两项备份：Vaultwarden 的数据库结构升级后通常不能回退到旧版本。
 
-### 6. 常用字段
+## 四、常用字段
 
 | 字段 | 说明 |
 | --- | --- |
@@ -217,18 +210,13 @@ docker compose up -d
 | `command` | 覆盖镜像默认启动命令 |
 | `networks` | 自定义网络 |
 
-### 7. 注意事项
+补充说明：
 
-- `ports` 默认绑定 `0.0.0.0`，公网可达。密码管理服务务必写成 `"127.0.0.1:<端口>:80"`，远程访问走 Tailscale Serve 或带 TLS 的反向代理；客户端不接受明文 HTTP。
-- `volumes` 里的绝对路径是绑定挂载，需要提前创建并保证可写；也可以写成 `./data` 相对于 Compose 文件目录，或用 `vw_data:/data` 交给 Docker 管理为命名卷。
-- 容器路径后的 `:ro` 表示只读挂载，容器内不能修改宿主机文件。
-- `depends_on` 默认只保证启动顺序，不保证服务就绪；本示例配合 `condition: service_healthy`，会等 PostgreSQL 健康检查通过。
+- `depends_on` 默认只保证启动顺序，不保证服务就绪；配合 `condition: service_healthy` 才会等健康检查通过再启动依赖服务。
 - 单实例场景可写 `container_name` 方便记忆；需要扩容或多副本时不要写，否则端口和名称会冲突。
-- `DOMAIN` 必须与实际使用的 HTTPS 地址（如 Tailscale Serve 生成的 `https://...ts.net`）一致，否则附件下载、WebSocket 通知等链接会指向错误地址。
-- `DATABASE_URL` 中的密码需做 URL 编码；用 `openssl rand -hex` 生成可避开特殊字符。
-- `postgres:18` 的默认数据目录是 `/var/lib/postgresql/18/docker`，因此卷挂在 `/var/lib/postgresql`；17 及更早版本才是 `/var/lib/postgresql/data`。
+- `env_file` 只把文件内容注入容器，不参与 YAML 插值，与 `.env` 的区别见下一节。
 
-## 四、环境变量
+## 五、环境变量
 
 两种变量来源经常混淆：
 
@@ -246,7 +234,7 @@ environment:
 
 `:-` 在变量为空时使用默认值，`:?` 在变量缺失时直接报错并停止。`.env` 常含密码或令牌，不要提交到 Git；仓库里可保留一份 `.env.example` 作为模板。
 
-## 五、常用命令
+## 六、常用命令
 
 ```bash
 docker compose up -d                     # 创建并后台启动
@@ -269,15 +257,18 @@ docker compose down -v                   # 同时删除命名卷（绑定挂载�
 
 > 🔴 本例使用绑定挂载，`docker compose down -v` 不会删除 `/srv/vaultwarden/vw_data` 和 `/srv/vaultwarden/db_data`。但直接删除 `/srv/vaultwarden` 会连数据一起删掉，清理前先确认已备份。
 
-## 六、卷与网络
+## 七、卷与网络
 
+- `volumes` 的绝对路径是绑定挂载，需要提前创建并保证可写；也可以写成 `./data`（相对 Compose 文件目录），或用 `vw_data:/data` 交给 Docker 管理为命名卷。
+- 命名卷由 Docker 统一存放在 `/var/lib/docker/volumes/<项目名>_<卷名>`，不用关心宿主机路径。
+- 容器路径后的 `:ro` 表示只读挂载，容器内不能修改宿主机文件。
 - 本例使用绑定挂载，数据直接位于 `/srv/vaultwarden/vw_data` 和 `/srv/vaultwarden/db_data`，便于查看、备份和迁移；目录权限需与容器内用户匹配。
-- 也可以改用命名卷（如 `vw_data:/data`），由 Docker 统一存放在 `/var/lib/docker/volumes/<项目名>_<卷名>`，不用关心宿主机路径。
 - `down` 只删除容器和网络；加 `-v` 仅删除命名卷，绑定挂载的宿主机目录不受影响。
+- `ports` 默认绑定 `0.0.0.0`，公网可达；对外服务建议只绑定回环（如 `"127.0.0.1:<端口>:80"`），远程访问走 TLS 反向代理，客户端不接受明文 HTTP。
 - 同一项目内的服务默认加入同一个网络，可直接用**服务名**互相访问；示例中的 `DATABASE_URL` 就是连接 `db:5432`，不需要发布数据库端口。
 - 需要访问项目外容器或固定网段时才声明自定义 `networks`，一般无需手动配置。
 
-## 七、使用建议
+## 八、使用建议
 
 - 镜像固定到具体版本，避免 `latest` 在重建时悄悄升级；升级前先备份数据目录和数据库。
 - Compose 文件与 `.env.example` 一起提交，实际 `.env` 加入 `.gitignore`。
